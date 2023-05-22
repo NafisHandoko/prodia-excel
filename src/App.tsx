@@ -80,8 +80,9 @@ function App() {
 					/> */}
 			</div>
 			<SpreadsheetComponent
+					allowConditionalFormat={true}
 					showRibbon={false}
-					showFormulaBar={false}
+					showFormulaBar={true}
 					ref={((s: SpreadsheetComponent) => ssObj = s)}
 					allowOpen={true}
 					height={'90%'}
