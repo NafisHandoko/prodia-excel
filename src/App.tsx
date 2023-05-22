@@ -1,12 +1,15 @@
 import './App.css';
 import {
+	CellModel,
 	RangeDirective, RangesDirective, SheetDirective, SheetsDirective,
-	SpreadsheetComponent
+	SpreadsheetComponent,
+	getCell
 } from '@syncfusion/ej2-react-spreadsheet';
 import { ChangeEvent, useEffect, useState } from 'react';
 
 function App() {
 	const [sheetFile, setSheetFile] = useState<File | null>(null)
+	let hasVLookUp = []
 	let ssObj: SpreadsheetComponent
 
 	const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -36,6 +39,46 @@ function App() {
 		}
 	}, [sheetFile])
 
+	const testAction = async () => {
+		// const x = await ssObj.getData('A1')
+		// console.log(x)
+		// ssObj.goTo('B5')
+		// let cell: CellModel = getCell(0, 0, ssObj.getActiveSheet()); // rowIndex, colIndex, sheetIndex
+	}
+
+	const indexToCellName = (row: number, col: number) => {
+
+		let dividend = col + 1;
+		let columnName = '';
+		let modulo;
+
+		while (dividend > 0) {
+			modulo = (dividend - 1) % 26;
+			columnName = String.fromCharCode(65 + modulo) + columnName;
+			dividend = Math.floor((dividend - modulo) / 26);
+		}
+
+		// Gabungkan bagian kolom dan baris untuk mendapatkan nama sel
+		const cellName = columnName + (row + 1);
+		return cellName
+
+	}
+
+	function vlookup(lookupValue: any, table: any, colIndex: any, exactMatch: any) {
+		for (let i = 0; i < table.length; i++) {
+			if (exactMatch) {
+				if (table[i][0] === lookupValue) {
+					return table[i][colIndex - 1];
+				}
+			} else {
+				if (table[i][0] == lookupValue) {
+					return table[i][colIndex - 1];
+				}
+			}
+		}
+		return "#N/A"; // Value not found
+	}
+
 	return (
 		<div className="App">
 			<input
@@ -49,6 +92,7 @@ function App() {
 					}
 				}
 			/>
+			<button onClick={testAction}>Action Test</button>
 			<SpreadsheetComponent
 				showRibbon={false}
 				ref={((s: SpreadsheetComponent) => ssObj = s)}
