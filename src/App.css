@@ -1,8 +1,9 @@
 @import url("https://cdn.syncfusion.com/ej2/bootstrap5.css");
 
-/* .App{
-  margin: 2%;
-} */
+.App{
+  padding: 3% 0;
+  height: 100vh;
+}
 
 /* #root {
   max-width: 1280px;
