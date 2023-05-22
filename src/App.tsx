@@ -1,27 +1,20 @@
 import './App.css';
 import {
-    RangeDirective, RangesDirective, SheetDirective, SheetsDirective,
-    SpreadsheetComponent
+	CellModel,
+	RangeDirective, RangesDirective, SheetDirective, SheetsDirective,
+	SpreadsheetComponent,
+	getCell
 } from '@syncfusion/ej2-react-spreadsheet';
-import defaultData from './data'
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 
 function App() {
 	const [sheetFile, setSheetFile] = useState<File | null>(null)
-	const [sheetFile2, setSheetFile2] = useState<File | null>(null)
-
-	const [fetchedJson, setFetchedJson] = useState<any>(null)
+	let hasVLookUp = []
 	let ssObj: SpreadsheetComponent
 
 	const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files != null) {
 			setSheetFile(e.target.files[0])
-		}
-	}
-
-	const handleFileChange2 = (e: ChangeEvent<HTMLInputElement>) => {
-		if (e.target.files != null) {
-
 		}
 	}
 
@@ -36,72 +29,81 @@ function App() {
 		},)
 		if (resp.ok) {
 			const respJson = await resp.json()
-			setFetchedJson(respJson)
-		}
-	}
-
-	const getData2 = async () => {
-		if (sheetFile) {
-			const resp = await ssObj.open({ file: sheetFile as File })
-			console.log(resp)
+			ssObj.openFromJson({ file: respJson })
 		}
 	}
 
 	useEffect(() => {
 		if (sheetFile) {
-			getData2()
+			getData()
 		}
 	}, [sheetFile])
 
+	const testAction = async () => {
+		// const x = await ssObj.getData('A1')
+		// console.log(x)
+		// ssObj.goTo('B5')
+		// let cell: CellModel = getCell(0, 0, ssObj.getActiveSheet()); // rowIndex, colIndex, sheetIndex
+	}
+
+	const indexToCellName = (row: number, col: number) => {
+
+		let dividend = col + 1;
+		let columnName = '';
+		let modulo;
+
+		while (dividend > 0) {
+			modulo = (dividend - 1) % 26;
+			columnName = String.fromCharCode(65 + modulo) + columnName;
+			dividend = Math.floor((dividend - modulo) / 26);
+		}
+
+		// Gabungkan bagian kolom dan baris untuk mendapatkan nama sel
+		const cellName = columnName + (row + 1);
+		return cellName
+
+	}
+
+	function vlookup(lookupValue: any, table: any, colIndex: any, exactMatch: any) {
+		for (let i = 0; i < table.length; i++) {
+			if (exactMatch) {
+				if (table[i][0] === lookupValue) {
+					return table[i][colIndex - 1];
+				}
+			} else {
+				if (table[i][0] == lookupValue) {
+					return table[i][colIndex - 1];
+				}
+			}
+		}
+		return "#N/A"; // Value not found
+	}
+
 	return (
-		<div className="App" style={{ marginTop: '60px', height: '100vh' }}>
-			<div style={{ display: 'flex', flexDirection: 'row', gap: '10px' }}>
-					<input
-						type="file"
-						name="sheet"
-						id="sheet"
-						onChange={handleFileChange}
-						style={
-							{
-									margin: '10px',
-							}
-						}
-					/>
-					{/* <input
-						type="file"
-						name="sheet"
-						id="sheet"
-						onChange={handleFileChange2}
-						style={
-							{
-									margin: '10px',
-							}
-						}
-					/> */}
-			</div>
+		<div className="App">
+			<input
+				type="file"
+				name="sheet"
+				id="sheet"
+				onChange={handleFileChange}
+				style={
+					{
+						margin: '10px',
+					}
+				}
+			/>
+			<button onClick={testAction}>Action Test</button>
 			<SpreadsheetComponent
-					allowConditionalFormat={true}
-					showRibbon={false}
-					showFormulaBar={true}
-					ref={((s: SpreadsheetComponent) => ssObj = s)}
-					allowOpen={true}
-					height={'90%'}
-					openUrl="https://ej2services.syncfusion.com/production/web-services/api/spreadsheet/open"
-					allowSave={true}
-					saveUrl="https://ej2services.syncfusion.com/production/web-services/api/spreadsheet/save"
-					sheets={fetchedJson ? fetchedJson.Workbook.sheets : []}
-					scrollSettings={{
-						isFinite: true,
-						enableVirtualization: false
-					}}
+				showRibbon={false}
+				ref={((s: SpreadsheetComponent) => ssObj = s)}
+				allowOpen={true}
+				height={'90%'}
+				allowSave={true}
+				scrollSettings={{
+					isFinite: true,
+					enableVirtualization: false
+				}}
 			>
-					{/* <SheetsDirective>
-						<SheetDirective>
-							<RangesDirective>
-									<RangeDirective dataSource={defaultData.slice(0, 5)}></RangeDirective>
-							</RangesDirective>
-						</SheetDirective>
-					</SheetsDirective> */}
 			</SpreadsheetComponent>
 		</div>
 	);
