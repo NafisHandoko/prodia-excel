@@ -41,15 +41,11 @@ function App() {
 	}, [sheetFile])
 
 	const customVlookup = (lookupValue: any, tableRange: string, colIndex: number, isShorted: any) => {
-		// let spreadsheet = new Spreadsheet({})
 		let tableRange_arr: any[] = tableRange.split(':')
 		for (let i = 0; i < tableRange_arr.length; i++) {
 			tableRange_arr[i] = cellNameToIndex(tableRange_arr[i])
 		}
 		for (let i = tableRange_arr[0][0]; i <= tableRange_arr[1][0]; i++) {
-			// if (getCell(i, tableRange_arr[0][1], spreadsheet.getActiveSheet()).value == lookupValue) {
-			// 	return getCell(i, tableRange_arr[0][1] + colIndex, spreadsheet.getActiveSheet()).value
-			// }
 			if (ssObj.computeExpression(`=${indexToCellName(i, tableRange_arr[0][1])}`) == lookupValue) {
 				return ssObj.computeExpression(`=${indexToCellName(i, tableRange_arr[0][1] + (colIndex - 1))}`)
 			}
