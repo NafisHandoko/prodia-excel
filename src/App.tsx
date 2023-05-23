@@ -1,11 +1,14 @@
 import './App.css';
+// import {
+// 	CellModel,
+// 	RangeDirective, RangesDirective, SheetDirective, SheetModel, SheetsDirective,
+// 	SpreadsheetComponent,
+// 	getCell
+// } from '@syncfusion/ej2-react-spreadsheet';
 import {
-	CellModel,
-	RangeDirective, RangesDirective, SheetDirective, SheetModel, SheetsDirective,
-	SpreadsheetComponent,
-	getCell
+	SpreadsheetComponent
 } from '@syncfusion/ej2-react-spreadsheet';
-import { Spreadsheet } from '@syncfusion/ej2-react-spreadsheet';
+// import { Spreadsheet } from '@syncfusion/ej2-react-spreadsheet';
 import { ChangeEvent, useEffect, useState } from 'react';
 
 function App() {
@@ -41,6 +44,7 @@ function App() {
 	}, [sheetFile])
 
 	const customVlookup = (lookupValue: any, tableRange: string, colIndex: number, isShorted: any) => {
+		console.log(isShorted)
 		let tableRange_arr: any[] = tableRange.split(':')
 		for (let i = 0; i < tableRange_arr.length; i++) {
 			tableRange_arr[i] = cellNameToIndex(tableRange_arr[i])
