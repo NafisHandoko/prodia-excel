@@ -10,9 +10,6 @@ import { ChangeEvent, useEffect, useState } from 'react';
 
 function App() {
 	const [sheetFile, setSheetFile] = useState<File | null>(null)
-	const [fetchedJson, setFetchedJson] = useState(null)
-	const [hasVlookup, setHasVlookup] = useState(null)
-	const [activeSheet, setActiveSheet] = useState<SheetModel>()
 	let ssObj: SpreadsheetComponent
 
 	const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -43,24 +40,21 @@ function App() {
 		}
 	}, [sheetFile])
 
-	const testCustomFunction = (str: string) => {
-		// return str + ' - Test'
-		console.log(str)
-	}
-
 	const customVlookup = (lookupValue: any, tableRange: string, colIndex: number, isShorted: any) => {
-		let spreadsheet = new Spreadsheet({})
+		// let spreadsheet = new Spreadsheet({})
 		let tableRange_arr: any[] = tableRange.split(':')
 		for (let i = 0; i < tableRange_arr.length; i++) {
 			tableRange_arr[i] = cellNameToIndex(tableRange_arr[i])
 		}
-		// console.log(ssObj.getActiveSheet())
 		for (let i = tableRange_arr[0][0]; i <= tableRange_arr[1][0]; i++) {
-			if (getCell(i, tableRange_arr[0][1], spreadsheet.getActiveSheet()).value == lookupValue) {
-				return getCell(i, tableRange_arr[0][1] + colIndex, spreadsheet.getActiveSheet()).value
+			// if (getCell(i, tableRange_arr[0][1], spreadsheet.getActiveSheet()).value == lookupValue) {
+			// 	return getCell(i, tableRange_arr[0][1] + colIndex, spreadsheet.getActiveSheet()).value
+			// }
+			if (ssObj.computeExpression(`=${indexToCellName(i, tableRange_arr[0][1])}`) == lookupValue) {
+				return ssObj.computeExpression(`=${indexToCellName(i, tableRange_arr[0][1] + (colIndex - 1))}`)
 			}
 		}
-		// return 100
+
 		// let arr: string[] = []
 		// const datas = await ssObj.getData(tableRange);
 		// return datas.forEach((data, i) => {
@@ -69,8 +63,6 @@ function App() {
 		// 		return data.value;
 		// 	}
 		// });
-		// console.log(datas.keys())
-		// console.log(arr)
 
 		// return new Promise(async (resolve) => {
 		// 	const datas = await ssObj.getData(tableRange);
@@ -99,51 +91,13 @@ function App() {
 	}
 
 	useEffect(() => {
-		setActiveSheet(ssObj.getActiveSheet())
-		ssObj.addCustomFunction(testCustomFunction, 'TEST')
 		ssObj.addCustomFunction(customVlookup, 'VLOOKUP')
 	}, [])
 
 	const testAction = async () => {
-		// const x = await ssObj.getData('A1')
-		// console.log(x)
-		// ssObj.goTo('B5')
-		// let cell: CellModel = getCell(0, 0, ssObj.getActiveSheet()); // rowIndex, colIndex, sheetIndex
-		// const sheet = spreadsheet.getActiveSheet();
-
-		// let cell: CellModel = getCell(3, 3, ssObj.getActiveSheet()); // rowIndex, colIndex, sheetIndex
-		// const formula = cell.formula
-		// vlookupTest(formula as string)
-		console.log(ssObj.getIndexes('A1'))
-	}
-
-	const vlookupTest = async (formula: string) => {
-		// const computed = ssObj.computeExpression('=G5+G6')
-		// console.log(computed)
-		// const selectedCell = await ssObj.getData('D4')
-		// let cell: CellModel = getCell(3, 3, ssObj.getActiveSheet()); // rowIndex, colIndex, sheetIndex
-		// const formula = cell.formula
-		// const computed = ssObj.computeExpression(formula as string)
-		// console.log(computed)
-		const lookupValue = 'Manager'
-		let arr: string[] = []
-		const range = await ssObj.getData('F4:G6')
-		range.forEach((data) => {
-			arr.push(data.value as string)
-		})
-		for (let i = 0; i < arr.length; i++) {
-			if (arr[i] === lookupValue) {
-				// return arr[i + 1];
-				console.log(arr[i + 1])
-			}
-		}
-		// for (let i = 0; i < values.length; i++) {
-		// 	if (values[i][0] === lookupValue) {
-		// 		return values[i][colIndex - 1];
-		// 	}
-		// }
-
-		return "#N/A"; // Value not found
+		// console.log(ssObj.computeExpression('=B2:C4'))
+		// console.log(ssObj.computeExpression('=A1+A2'))
+		console.log(ssObj.computeExpression(`=${indexToCellName(3, 6)}`))
 	}
 
 	const indexToCellName = (row: number, col: number) => {
@@ -158,7 +112,6 @@ function App() {
 			dividend = Math.floor((dividend - modulo) / 26);
 		}
 
-		// Gabungkan bagian kolom dan baris untuk mendapatkan nama sel
 		const cellName = columnName + (row + 1);
 		return cellName
 
